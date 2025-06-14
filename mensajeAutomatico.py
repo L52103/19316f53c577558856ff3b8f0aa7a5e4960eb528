@@ -1,46 +1,55 @@
+import discord
+from discord.ext import commands, tasks
 import json
 from datetime import datetime, timedelta
-from twilio.rest import Client
+import asyncio
 import os
 
-# Carga credenciales desde variables de entorno
-TWILIO_SID = os.environ["TWILIO_SID"]
-TWILIO_AUTH = os.environ["TWILIO_AUTH_TOKEN"]
-TWILIO_FROM = "whatsapp:+14155238886"
-DESTINO = "whatsapp:+56990907349"
+# Variables de entorno seguras desde Replit Secrets
+TOKEN = os.environ["DISCORD_TOKEN"]
+USER_ID = int(os.environ["DISCORD_USER_ID"])
+ALERT_CHANNEL_ID = int(os.environ["DISCORD_ALERT_CHANNEL_ID"])
+MENSAJE_DIARIO = os.environ["MENSAJE_DIARIO"]
+MENSAJE_ALERTA = os.environ["MENSAJE_ALERTA"]
 
-client = Client(TWILIO_SID, TWILIO_AUTH)
+bot = commands.Bot(command_prefix="!")
 
-# Mensajes personalizados
-MENSAJE_ADVERTENCIA = "Contesta este mensaje con Lycoris"
-MENSAJE_FINAL = "No se recibió respuesta. Esto es una alerta automatizada."
+# Base de datos simple
+def guardar_respuesta():
+    with open("db.json", "w") as f:
+        json.dump({"last_response": datetime.utcnow().isoformat()}, f)
 
-# Leer última respuesta
-try:
-    with open("db.json", "r") as f:
-        data = json.load(f)
-        ultima_respuesta = datetime.fromisoformat(data["last_response"]) if data["last_response"] else None
-except:
-    ultima_respuesta = None
+def obtener_respuesta():
+    try:
+        with open("db.json", "r") as f:
+            data = json.load(f)
+            return datetime.fromisoformat(data["last_response"])
+    except:
+        return None
 
-# Verificar si han pasado más de 48 horas
-ahora = datetime.utcnow()
-tiempo_limite = timedelta(hours=48)
+# Tarea que corre cada 24h
+@tasks.loop(hours=24)
+async def tarea_diaria():
+    user = await bot.fetch_user(USER_ID)
+    await user.send(MENSAJE_DIARIO)
+    
+    # Esperar 48 horas y verificar si respondió
+    await asyncio.sleep(300)
+    ultima = obtener_respuesta()
+    if not ultima or datetime.utcnow() - ultima > timedelta(hours=48):
+        canal = bot.get_channel(ALERT_CHANNEL_ID)
+        await canal.send(MENSAJE_ALERTA)
 
-if not ultima_respuesta or (ahora - ultima_respuesta) > tiempo_limite:
-    print("🚨 No hubo respuesta en 48 horas. Enviando alerta.")
-    client.messages.create(
-        body=MENSAJE_FINAL,
-        from_=TWILIO_FROM,
-        to=DESTINO
-    )
-else:
-    print("✅ Ya se recibió respuesta dentro del plazo. No se envía alerta.")
+@bot.event
+async def on_ready():
+    print(f"🤖 Bot listo: {bot.user}")
+    tarea_diaria.start()
 
-# Siempre se envía advertencia diaria
-client.messages.create(
-    body=MENSAJE_ADVERTENCIA,
-    from_=TWILIO_FROM,
-    to=DESTINO
-)
-print("📤 Mensaje de advertencia enviado.")
+@bot.event
+async def on_message(message):
+    if message.author.id == USER_ID and "lycoris" in message.content.lower():
+        guardar_respuesta()
+        await message.channel.send("✅ Respuesta registrada. Me alegra saber de ti.")
+    await bot.process_commands(message)
+
+bot.run(TOKEN)
