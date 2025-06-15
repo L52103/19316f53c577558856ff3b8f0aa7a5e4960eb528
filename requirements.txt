@@ -1,2 +1,1 @@
-flask
-twilio
+discord.py==2.3.2

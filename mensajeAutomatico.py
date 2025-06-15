@@ -11,6 +11,7 @@ USER_ID = int(os.environ["DISCORD_USER_ID"])
 ALERT_CHANNEL_ID = int(os.environ["DISCORD_ALERT_CHANNEL_ID"])
 MENSAJE_DIARIO = os.environ["MENSAJE_DIARIO"]
 MENSAJE_ALERTA = os.environ["MENSAJE_ALERTA"]
+PALABRA_CLAVE = os.environ["PALABRA_CLAVE"]
 
 intents = discord.Intents.default()
 intents.messages = True
@@ -31,20 +32,23 @@ def obtener_respuesta():
     except:
         return None
 
-# Tarea que corre cada 24h
+# Tarea que corre cada 48 horas
 @tasks.loop(hours=48)
 async def tarea_diaria():
     user = await bot.fetch_user(USER_ID)
     await user.send(MENSAJE_DIARIO)
 
-    # Esperar 48 horas y verificar si respondió
-    await asyncio.sleep(48 * 3600)  # 48 horas reales
+    # Esperar 48 horas y verificar si hay respuesta
+    await asyncio.sleep(48 * 3600)  
     ultima = obtener_respuesta()
     if not ultima or datetime.now(timezone.utc) - ultima > timedelta(hours=48):
-        canal = bot.get_channel(ALERT_CHANNEL_ID)
-        await canal.send(MENSAJE_ALERTA)
+        alert_user = await bot.fetch_user(ALERT_CHANNEL_ID)
+        if alert_user:
+            await alert_user.send(MENSAJE_ALERTA)
+        else:
+            print("⚠️ No se encontró al usuario de alerta.")
 
-        # Detener la tarea diaria
+        # Detener la tarea
         tarea_diaria.stop()
 
 
@@ -55,9 +59,9 @@ async def on_ready():
 
 @bot.event
 async def on_message(message):
-    if message.author.id == USER_ID and "lycoris" in message.content.lower():
+    if message.author.id == USER_ID and PALABRA_CLAVE.lower() in message.content.lower():
         guardar_respuesta()
-        await message.channel.send("✅ Respuesta registrada. El tiempo ha sido reseteado.")
+        await message.channel.send(" Respuesta recibida. El tiempo ha sido reseteado.")
     await bot.process_commands(message)
 
 bot.run(TOKEN)
