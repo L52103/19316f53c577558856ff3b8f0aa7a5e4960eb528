@@ -39,7 +39,7 @@ async def tarea_diaria():
     await user.send(MENSAJE_DIARIO)
 
     # Esperar 48 horas y verificar si hay respuesta
-    await asyncio.sleep(48 * 3600)  
+    await asyncio.sleep(48 * 3600)
     ultima = obtener_respuesta()
     if not ultima or datetime.now(timezone.utc) - ultima > timedelta(hours=48):
         alert_user = await bot.fetch_user(ALERT_CHANNEL_ID)
@@ -51,7 +51,6 @@ async def tarea_diaria():
         # Detener la tarea
         tarea_diaria.stop()
 
-
 @bot.event
 async def on_ready():
     print(f"🤖 Bot listo: {bot.user}")
@@ -61,7 +60,28 @@ async def on_ready():
 async def on_message(message):
     if message.author.id == USER_ID and PALABRA_CLAVE.lower() in message.content.lower():
         guardar_respuesta()
-        await message.channel.send(" Respuesta recibida. El tiempo ha sido reseteado.")
+        await message.channel.send("✅ Respuesta recibida. El tiempo ha sido reseteado.")
     await bot.process_commands(message)
+
+# ----------------------------
+# Servidor Flask para Replit
+# ----------------------------
+from flask import Flask
+from threading import Thread
+
+app = Flask('')
+
+@app.route('/')
+def home():
+    return "El bot está funcionando."
+
+def run():
+    app.run(host='0.0.0.0', port=8080)
+
+def mantener_vivo():
+    t = Thread(target=run)
+    t.start()
+
+mantener_vivo()
 
 bot.run(TOKEN)
