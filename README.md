@@ -12,7 +12,7 @@ Ideal para chequeos periódicos, recordatorios personales o sistemas de bienesta
 - Espera una respuesta con una palabra clave .
 - Si no hay respuesta en ese plazo, **envía una alerta** a otro usuario o canal.
 - Si se responde correctamente, se reinicia el temporizador.
-- ⚠ **Todos los usuarios involucrados deben estar en el mismo servidor que el bot**.
+-  **Todos los usuarios involucrados deben estar en el mismo servidor que el bot**.
 
 ---
 
