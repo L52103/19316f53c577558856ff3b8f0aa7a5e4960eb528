@@ -1,4 +1,4 @@
-# 🤖 Bot de Recordatorio y Verificación por Discord
+#  Bot de Recordatorio y Verificación por Discord
 
 Este bot envía un mensaje privado **cada 48 horas** a un usuario específico y espera una respuesta con una palabra clave.  
 Si no recibe respuesta dentro del tiempo límite, **se envía una alerta a otra persona o canal**.  
@@ -6,17 +6,17 @@ Ideal para chequeos periódicos, recordatorios personales o sistemas de bienesta
 
 ---
 
-## ✅ ¿Qué hace este bot?
+##  ¿Qué hace este bot?
 
 - Envía un **mensaje privado automático** cada 48 horas a un usuario específico.
 - Espera una respuesta con una palabra clave .
 - Si no hay respuesta en ese plazo, **envía una alerta** a otro usuario o canal.
 - Si se responde correctamente, se reinicia el temporizador.
-- ⚠️ **Todos los usuarios involucrados deben estar en el mismo servidor que el bot**.
+- ⚠ **Todos los usuarios involucrados deben estar en el mismo servidor que el bot**.
 
 ---
 
-## 📋 Requisitos
+##  Requisitos
 
 - Cuenta en [Discord](https://discord.com/)
 - Servidor de Discord donde esté el bot y los usuarios involucrados
@@ -25,7 +25,7 @@ Ideal para chequeos periódicos, recordatorios personales o sistemas de bienesta
 
 ---
 
-## 🛠 Paso 1: Crear el Bot en Discord
+##  Paso 1: Crear el Bot en Discord
 
 1. Ve a [Discord Developer Portal](https://discord.com/developers/applications)
 2. Haz clic en **"New Application"** y ponle un nombre.
@@ -33,7 +33,7 @@ Ideal para chequeos periódicos, recordatorios personales o sistemas de bienesta
 4. Activa la opción **MESSAGE CONTENT INTENT** en *Privileged Gateway Intents*
 5. Copia el **TOKEN del bot** (lo usarás luego en Render)
 
-### 🔗 Invitar el bot a tu servidor
+###  Invitar el bot a tu servidor
 
 1. Ve a la sección **OAuth2 → URL Generator**
 2. Marca los siguientes scopes:
@@ -47,7 +47,7 @@ Ideal para chequeos periódicos, recordatorios personales o sistemas de bienesta
 
 ---
 
-## 🔐 Paso 2: Configurar Variables de Entorno
+##  Paso 2: Configurar Variables de Entorno
 
 Render permite definir variables de entorno para configurar el bot sin modificar el código.
 
