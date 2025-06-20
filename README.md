@@ -1,74 +1,113 @@
-# Bot de Recordatorio y Verificación por Discord
+# 🤖 Bot de Recordatorio y Verificación por Discord
 
-Este bot envía un mensaje privado cada 48 horas a un usuario específico y espera una respuesta con una palabra clave. Si no recibe respuesta dentro del tiempo límite, se envía una alerta a otra persona. Ideal para chequeos periódicos.
----
-
-##  ¿Qué hace este bot?
-
--  Envía un mensaje privado automático cada 48 horas a un usuario específico.
--  Espera una respuesta con una palabra clave (como "Lycoris").
--  Si no hay respuesta en el tiempo configurado, envía una alerta a otra persona.
--  Si se responde correctamente, se reinicia el temporizador.
-
-> ⚠️ El bot y ambos usuarios **deben estar en el mismo servidor** para que el envío de mensajes funcione correctamente.
+Este bot envía un mensaje privado **cada 48 horas** a un usuario específico y espera una respuesta con una palabra clave.  
+Si no recibe respuesta dentro del tiempo límite, **se envía una alerta a otra persona o canal**.  
+Ideal para chequeos periódicos, recordatorios personales o sistemas de bienestar.
 
 ---
 
-## 📦 Requisitos
+## ✅ ¿Qué hace este bot?
 
-- Cuenta de Discord
-- Un servidor de Discord donde el bot esté invitado
-- la persona que reciba el mensaje debe estar en el server tambien, de esta forma el bot lo puede encontrar
-- [Replit](https://replit.com/) (o tu entorno Python preferido)
-
----
-
-## 🧑‍💻 Importar el Proyecto en Replit
-
-### 🔁 Opción Rápida: Clonar desde GitHub (o tambien puedes crear el tuyo e iniciar sesión)
-
-1. Ve a [https://replit.com/import](https://replit.com/import)
-2. Pega la URL de tu repositorio GitHub (ej. `https://github.com/usuario/bot-recordatorio-discord`)
-3. Se importará automáticamente todo el código.
-
-> Si no tienes el repo aún, puedes subir estos archivos manualmente o pedirme que te genere uno.
+- Envía un **mensaje privado automático** cada 48 horas a un usuario específico.
+- Espera una respuesta con una palabra clave .
+- Si no hay respuesta en ese plazo, **envía una alerta** a otro usuario o canal.
+- Si se responde correctamente, se reinicia el temporizador.
+- ⚠️ **Todos los usuarios involucrados deben estar en el mismo servidor que el bot**.
 
 ---
 
-## 🔒 Configurar Variables de Entorno (Secrets en Replit)
-(si no encuentra la opcion, a la izquierda hay un icono de 4 cuadrados, ahí lo buscas como secrets)
-Haz clic en el ícono 🔐 de "Secrets" (Environment Variables) y agrega:
+## 📋 Requisitos
 
-| Clave                      | Descripción                                 | Ejemplo                         |
-|---------------------------|---------------------------------------------|---------------------------------|
-| `DISCORD_TOKEN`           | Token del bot                               | `MzQx...`                       |
-| `DISCORD_USER_ID`         | ID del usuario que debe responder           | `123456789012345678`           |
-| `DISCORD_ALERT_CHANNEL_ID`| ID del usuario que recibirá la alerta       | `987654321098765432`           |
-| `MENSAJE_DIARIO`          | Mensaje que se envía cada 48 horas          | `Contesta este mensaje con Lycoris.` |
-| `MENSAJE_ALERTA`          | Mensaje de alerta si no hay respuesta       | `⚠️ No ha respondido en 48 horas.` |
-| `PALABRA_CLAVE`           | Palabra clave que resetea el contador       | `lycoris`                       |
+- Cuenta en [Discord](https://discord.com/)
+- Servidor de Discord donde esté el bot y los usuarios involucrados
+- Cuenta en [Render](https://render.com)
+- Código fuente de este repositorio (ya incluido)
 
 ---
 
-## 📥 Instalación de dependencias
+## 🛠 Paso 1: Crear el Bot en Discord
 
-en el terminal de replit colocar:
-pip install -r requirements.txt
+1. Ve a [Discord Developer Portal](https://discord.com/developers/applications)
+2. Haz clic en **"New Application"** y ponle un nombre.
+3. En el menú lateral, selecciona **Bot** → **Add Bot**
+4. Activa la opción **MESSAGE CONTENT INTENT** en *Privileged Gateway Intents*
+5. Copia el **TOKEN del bot** (lo usarás luego en Render)
 
-O simplemente:
+### 🔗 Invitar el bot a tu servidor
 
-pip install discord.py
+1. Ve a la sección **OAuth2 → URL Generator**
+2. Marca los siguientes scopes:
+   - `bot`
+   - `applications.commands`
+3. En "Bot Permissions", selecciona:
+   - `Send Messages`
+   - `Read Message History`
+   - `View Channels`
+4. Copia la URL generada, pégala en tu navegador e invita el bot a tu servidor
 
+---
 
-## Run 
+## 🔐 Paso 2: Configurar Variables de Entorno
 
-- En replit habra un .replit, dentro de este se puede cambiar el parametro de que quiere que se ejecute, el comando de ejecución es python3 "Nombre archivo".py
+Render permite definir variables de entorno para configurar el bot sin modificar el código.
 
-desde el .replit deberia quedar de la siguiente forma: 
+| Clave                       | Descripción                                                | Ejemplo                              |
+|----------------------------|------------------------------------------------------------|--------------------------------------|
+| `DISCORD_TOKEN`            | Token del bot de Discord                                   | `MzQx...`                            |
+| `DISCORD_USER_ID`          | ID del usuario que debe responder                          | `12345645678.......`                |
+| `DISCORD_ALERT_CHANNEL_ID` | ID del canal o usuario que recibirá la alerta              | `98765432109.......`                |
+| `MENSAJE_DIARIO`           | Mensaje que se envía cada 48 horas                         | `Contesta este mensaje con ........`|
+| `MENSAJE_ALERTA`           | Mensaje enviado si no hay respuesta en 48 horas            | `⚠️ No ha respondido en 48 horas.`   |
+| `PALABRA_CLAVE`            | Palabra clave que reinicia el contador                     | `palabra`                            |
 
-Ej:
+> Puedes obtener IDs activando el **modo desarrollador** en Discord (Configuración → Avanzado).
 
-run = "python3 mensajeAutomatico.py"
+---
 
+##  Paso 3: Desplegar en Render
 
+1. Inicia sesión en (https://render.com)
+2. Haz clic en **New Web Service**
+3. Selecciona **"Deploy from Git repository"** y elige este repositorio
+4. Completa los siguientes campos:
+
+###  Configuración general
+
+- **Name**: `bot-recordatorio` (o el nombre que prefieras)
+- **Environment**: `Python`
+- **Build Command**:
+  ```bash
+  pip install -r requirements.txt
+
+###  Variables de entorno
+
+Agrega todas las variables mencionadas anteriormente en la sección **Environment > Environment Variables** de tu servicio en Render.
+
+---
+
+### Instance Type
+
+- Puedes usar el plan **Free** si no necesitas disponibilidad 24/7.
+- Para uso continuo o profesional, considera un plan de pago (**Starter** o superior).
+
+Una vez completado todo, haz clic en **Create Web Service** y Render comenzará a construir y ejecutar el bot.
+
+---
+
+### Confirmar que Funciona
+
+En los logs de Render deberías ver una línea similar a:
+
+- El bot enviará automáticamente el mensaje de chequeo al usuario definido.
+- Si el usuario responde correctamente con la palabra clave, se reinicia el temporizador.
+- Si no lo hace, después de 48 horas se enviará una alerta al destinatario configurado.
+
+---
+
+### Extras
+
+Puedes modificar el intervalo del temporizador en el código cambiando esta línea:
+
+```python
+@tasks.loop(hours=48)
 
