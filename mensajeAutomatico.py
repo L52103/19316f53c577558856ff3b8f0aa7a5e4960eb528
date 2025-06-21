@@ -46,7 +46,7 @@ async def tarea_diaria():
         if alert_user:
             await alert_user.send(MENSAJE_ALERTA)
         else:
-            print("⚠️ No se encontró al usuario de alerta.")
+            print(" No se encontró al usuario de alerta.")
 
         # Detener la tarea
         tarea_diaria.stop()
@@ -60,7 +60,7 @@ async def on_ready():
 async def on_message(message):
     if message.author.id == USER_ID and PALABRA_CLAVE.lower() in message.content.lower():
         guardar_respuesta()
-        await message.channel.send("✅ Respuesta recibida. El tiempo ha sido reseteado.")
+        await message.channel.send(" Respuesta recibida. El tiempo ha sido reseteado.")
     await bot.process_commands(message)
 
 # ----------------------------
